@@ -29,6 +29,8 @@ import org.culturegraph.mf.framework.annotations.Description;
 import org.culturegraph.mf.framework.annotations.In;
 import org.culturegraph.mf.framework.annotations.Out;
 import org.culturegraph.mf.util.FileCompression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -44,7 +46,8 @@ public final class FileOpener extends DefaultObjectPipe<String, ObjectReceiver<R
 
 	private String encoding = "UTF-8";
 	private FileCompression compression = FileCompression.AUTO;
-
+	private static final Logger LOG = LoggerFactory
+			.getLogger(FileOpener.class);
 	/**
 	 * Returns the encoding used to open the resource.
 	 * 
@@ -101,7 +104,10 @@ public final class FileOpener extends DefaultObjectPipe<String, ObjectReceiver<R
 				throw e;
 			}
 		} catch (IOException e) {
-			throw new MetafactureException(e);
+			LOG.warn(e+"\nCaused by processing file: "+file);
+		}
+		catch (MetafactureException e) {
+			LOG.warn(e+"\nCaused by processing file: "+file);
 		}
 	}
 
