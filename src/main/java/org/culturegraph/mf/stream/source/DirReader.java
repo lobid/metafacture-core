@@ -17,11 +17,13 @@ package org.culturegraph.mf.stream.source;
 
 import java.io.File;
 
+import org.culturegraph.mf.exceptions.MetafactureException;
 import org.culturegraph.mf.framework.DefaultObjectPipe;
 import org.culturegraph.mf.framework.ObjectReceiver;
 import org.culturegraph.mf.framework.annotations.Description;
 import org.culturegraph.mf.framework.annotations.In;
 import org.culturegraph.mf.framework.annotations.Out;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads a directory and emits all filenames found.
@@ -58,7 +60,14 @@ public final class DirReader extends DefaultObjectPipe<String, ObjectReceiver<St
 					dir(file);
 				}
 			} else {
-				receiver.process(file.getAbsolutePath());
+				try {
+					receiver.process(file.getAbsolutePath());
+				}
+				catch (MetafactureException e) {
+					LoggerFactory.getLogger(DirReader.class)
+					.error("Problems with file '"+file+"'", e);
+				}
+				
 			}
 		}
 	}
