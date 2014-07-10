@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.culturegraph</groupId>
 	<artifactId>metafacture-core</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.0.2-SNAPSHOT</version>
 	<name>metafacture.core</name>
 	<description>Core package of the metafacture tool suite</description>
 	<licenses>
@@ -13,17 +13,14 @@
 	</licenses>
 	<url>http://github.com/culturegraph/metafacture-core</url>
 	<distributionManagement>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Sonatype OSS Maven Repository : Releases</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
 		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype OSS Maven Repository : Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<!-- <uniqueVersion>true</uniqueVersion> -->
-		</snapshotRepository>
+			<id>lobid-snapshots</id>
+		<url>file:///${basedir}/../../lobid.github.com/snapshots/</url>
+	</snapshotRepository>
+		<repository>
+			<id>lobid-releases</id>
+			<url>file:///${basedir}/../../lobid.github.com/releases/</url>
+		</repository>
 	</distributionManagement>
 	<developers>
 		<developer>

@@ -21,58 +21,62 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.culturegraph.mf.exceptions.MetafactureException;
 import org.culturegraph.mf.framework.DefaultObjectPipe;
 import org.culturegraph.mf.framework.ObjectReceiver;
 import org.culturegraph.mf.framework.annotations.Description;
 import org.culturegraph.mf.framework.annotations.In;
 import org.culturegraph.mf.framework.annotations.Out;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Opens a {@link URLConnection} and passes a reader to the receiver.
- * 
+ *
  * @author Christoph Böhme
  * @author Jan Schnasse
- * 
+ *
  */
 @Description("Opens a http resource. Supports the setting of Accept and Accept-Charset as http header fields.")
 @In(String.class)
 @Out(java.io.Reader.class)
-public final class HttpOpener 
-		extends DefaultObjectPipe<String, ObjectReceiver<Reader>> implements Opener {
+public final class HttpOpener extends DefaultObjectPipe<String, ObjectReceiver<Reader>> implements
+Opener {
+	private static final Logger LOG = LoggerFactory.getLogger(HttpOpener.class);
 	private String encoding = "UTF-8";
 	private String accept = "*/*";
 
-	/**  
-	 * @param accept The accept header in the form type/subtype, e.g. text/plain.
+	@Override
+	public void process(final String urlStr) {
+		HttpOpener.LOG.debug("Try opening '" + urlStr + "'");
+		try {
+			final URL url = new URL(urlStr);
+			final URLConnection con = url.openConnection();
+			con.addRequestProperty("Accept", this.accept);
+			con.addRequestProperty("Accept-Charset", this.encoding);
+			String enc = con.getContentEncoding();
+			if (enc == null) {
+				enc = this.encoding;
+			}
+			getReceiver().process(new InputStreamReader(con.getInputStream(), enc));
+		} catch (final IOException e) {
+			HttpOpener.LOG.warn(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param accept
+	 *            The accept header in the form type/subtype, e.g. text/plain.
 	 */
 	public void setAccept(final String accept) {
 		this.accept = accept;
 	}
 
 	/**
-	 * @param encoding The encoding is used to encode the output and is passed 
-	 * as Accept-Charset to the http connection.
+	 * @param encoding
+	 *            The encoding is used to encode the output and is passed as
+	 *            Accept-Charset to the http connection.
 	 */
 	public void setEncoding(final String encoding) {
 		this.encoding = encoding;
-	}
-
-	@Override
-	public void process(final String urlStr) {
-		try {
-			final URL url = new URL(urlStr);
-			final URLConnection con = url.openConnection();
-			con.addRequestProperty("Accept", accept);
-			con.addRequestProperty("Accept-Charset", encoding);
-			String enc = con.getContentEncoding();
-			if (enc == null) {
-				enc = encoding;
-			}
-			getReceiver().process(new InputStreamReader(con.getInputStream(), enc));
-		} catch (IOException e) {
-			throw new MetafactureException(e);
-		}
 	}
 }
